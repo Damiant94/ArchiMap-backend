@@ -1,0 +1,19 @@
+{
+  "name": "archimap-backend",
+  "version": "0.0.0",
+  "description": "App for browsing interesting architecture objects on map",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start-server": "node app.js"
+  },
+  "author": "Damian Tulacz",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
