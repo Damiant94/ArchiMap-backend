@@ -62,3 +62,25 @@ export const getObject = (req: Request, res: Response, next: NextFunction) => {
       next(err);
     });
 };
+
+export const getCountries = (req: Request, res: Response, next: NextFunction) => {
+  ObjectModel.find()
+    .then((objects) => {
+      const countries: string[] = [];
+      objects.forEach(({location}) => {
+        if (!countries.includes(location.country)) {
+          countries.push(location.country);
+        }
+      })
+      return countries;
+    })
+    .then((countries) => {
+      res.status(200).json(countries);
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
