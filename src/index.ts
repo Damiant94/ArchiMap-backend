@@ -13,7 +13,7 @@ const port = process.env.PORT;
 
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const origin = process.env.NODE_ENV === "production" ? "https://archimap-frontend.onrender.com" : "*";
+  const origin = process.env.NODE_ENV === "prod" ? "https://archimap-frontend.onrender.com" : "*";
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader(
     "Access-Control-Allow-Methods",
