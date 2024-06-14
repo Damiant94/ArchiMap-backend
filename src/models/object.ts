@@ -16,7 +16,7 @@ const locationSchema = new Schema(
       type: String,
       required: true,
     },
-    city: {
+    place: {
       type: String,
       required: true,
     },
@@ -66,7 +66,7 @@ export interface ObjectData {
   username: string;
   category: ObjectCategory;
   location: {
-    city: string;
+    place: string;
     country: string;
     coordinates: number[];
   };
