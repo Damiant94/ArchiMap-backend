@@ -17,13 +17,13 @@ export const addObject = (req: Request, res: Response, next: NextFunction) => {
   const newObject = new ObjectModel<ObjectData>({ ...req.body });
   newObject
     .save()
-    .then((result) => {
+    .then(() => {
       res.status(201).json({
         message: "Object created successfully!",
         newObject: newObject,
       });
     })
-    .catch((err) => {
+    .catch((err: ResponseError) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -32,11 +32,18 @@ export const addObject = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const getObjects = (req: Request, res: Response, next: NextFunction) => {
-  ObjectModel.find()
-    .then((objects) => {
+  const query = getFiltersQuery(req.query);
+  const currentPage = Number(req.query.page) || 1;
+  const perPage = 10;
+  ObjectModel.find(query)
+    .collation({ locale: "en" })
+    .sort({ name: 1 })
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage)
+    .then((objects: ObjectData[] | any) => {
       res.status(200).json(objects);
     })
-    .catch((err) => {
+    .catch((err: ResponseError) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -44,10 +51,53 @@ export const getObjects = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
+export const getObjectsForMap = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const query = getFiltersQuery(req.query);
+  console.log(req.query)
+  ObjectModel.find(query)
+    .then((objects: ObjectData[]) => {
+      return objects.map(({ _id, location, category }) => {
+        return {
+          id: _id,
+          coordinateLonLat: location.coordinateLonLat,
+          category: category,
+        };
+      });
+    })
+    .then((objects: ObjectData[] | any) => {
+      res.status(200).json(objects);
+    })
+    .catch((err: ResponseError) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+const getFiltersQuery = (reqQuery: any) => {
+  const { querySearch, category, country } = reqQuery;
+  let query: any = {};
+  if (country) {
+    query["location.country"] = { $regex: country, $options: "i" };
+  }
+  if (querySearch) {
+    query["name"] = { $regex: querySearch, $options: "i" };
+  }
+  if (category) {
+    query["category"] = { $regex: category, $options: "i" };
+  }
+  return query;
+};
+
 export const getObject = (req: Request, res: Response, next: NextFunction) => {
   const objectId = req.params.objectId;
   ObjectModel.findById(objectId)
-    .then((object) => {
+    .then((object: ObjectData | null) => {
       if (!object) {
         const error = new Error("Could not find object.") as ResponseError;
         error.statusCode = 404;
@@ -55,7 +105,7 @@ export const getObject = (req: Request, res: Response, next: NextFunction) => {
       }
       res.status(200).json(object);
     })
-    .catch((err) => {
+    .catch((err: ResponseError) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -63,21 +113,25 @@ export const getObject = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export const getCountries = (req: Request, res: Response, next: NextFunction) => {
+export const getCountries = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   ObjectModel.find()
-    .then((objects) => {
+    .then((objects: ObjectData[]) => {
       const countries: string[] = [];
-      objects.forEach(({location}) => {
+      objects.forEach(({ location }) => {
         if (!countries.includes(location.country)) {
           countries.push(location.country);
         }
-      })
+      });
       return countries;
     })
-    .then((countries) => {
+    .then((countries: string[]) => {
       res.status(200).json(countries);
     })
-    .catch((err) => {
+    .catch((err: ResponseError) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }

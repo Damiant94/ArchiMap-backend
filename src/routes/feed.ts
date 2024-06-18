@@ -2,7 +2,7 @@ import express from 'express';
 import { body } from 'express-validator';
 import bodyParser from "body-parser";
 
-import { addObject, getCountries, getObject, getObjects } from '../controllers/feed';
+import { addObject, getCountries, getObject, getObjects, getObjectsForMap } from '../controllers/feed';
 
 const router = express.Router();
 const jsonParser = bodyParser.json()
@@ -18,6 +18,8 @@ router.post(
 );
 
 router.get('/get-objects', getObjects);
+
+router.get('/get-objects-for-map', getObjectsForMap);
 
 router.get('/get-countries', getCountries);
 

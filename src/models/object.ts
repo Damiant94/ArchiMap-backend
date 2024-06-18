@@ -61,6 +61,7 @@ const objectSchema = new Schema(
 );
 
 export interface ObjectData {
+  _id: any;
   name: string;
   description: string;
   username: string;
@@ -68,7 +69,7 @@ export interface ObjectData {
   location: {
     place: string;
     country: string;
-    coordinates: number[];
+    coordinateLonLat: number[];
   };
   imageUrl?: string;
 }
