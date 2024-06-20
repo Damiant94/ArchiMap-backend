@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import { NextFunction, Request, Response } from "express";
 
-import ObjectModel, { ObjectData } from "../models/object";
+import ObjectModel, { ObjectData, ObjectStatus } from "../models/object";
 import { ResponseError } from "../utils/responseError";
 
 export const addObject = (req: Request, res: Response, next: NextFunction) => {
@@ -57,7 +57,6 @@ export const getObjectsForMap = (
   next: NextFunction
 ) => {
   const query = getFiltersQuery(req.query);
-  console.log(req.query)
   ObjectModel.find(query)
     .then((objects: ObjectData[]) => {
       return objects.map(({ _id, location, category }) => {
@@ -91,6 +90,7 @@ const getFiltersQuery = (reqQuery: any) => {
   if (category) {
     query["category"] = { $regex: category, $options: "i" };
   }
+  query["status"] = { $not: { $regex: ObjectStatus.NEW } };
   return query;
 };
 
@@ -118,7 +118,7 @@ export const getCountries = (
   res: Response,
   next: NextFunction
 ) => {
-  ObjectModel.find()
+  ObjectModel.find({ status: { $not: { $regex: ObjectStatus.NEW } } })
     .then((objects: ObjectData[]) => {
       const countries: string[] = [];
       objects.forEach(({ location }) => {
@@ -126,6 +126,7 @@ export const getCountries = (
           countries.push(location.country);
         }
       });
+      countries.sort();
       return countries;
     })
     .then((countries: string[]) => {

@@ -10,6 +10,12 @@ export enum ObjectCategory {
   OTHER = "OTHER",
 }
 
+export enum ObjectStatus {
+  NEW = "NEW",
+  REPORTED = "REPORTED",
+  OK = "OK",
+}
+
 const locationSchema = new Schema(
   {
     country: {
@@ -56,6 +62,10 @@ const objectSchema = new Schema(
       type: String,
       required: false,
     },
+    status: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true }
 );
@@ -72,8 +82,13 @@ export interface ObjectData {
     coordinateLonLat: number[];
   };
   imageUrl?: string;
+  status?: ObjectStatus;
 }
 
-const ObjectModel = mongoose.model<ObjectData>("Object", objectSchema, "objects");
+const ObjectModel = mongoose.model<ObjectData>(
+  "Object",
+  objectSchema,
+  "objects"
+);
 
 export default ObjectModel;
