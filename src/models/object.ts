@@ -44,10 +44,6 @@ const objectSchema = new Schema(
       type: String,
       required: true,
     },
-    username: {
-      type: String,
-      required: true,
-    },
     category: {
       type: String,
       required: true,
@@ -73,7 +69,6 @@ export interface ObjectData {
   _id: any;
   name: string;
   description: string;
-  username: string;
   category: ObjectCategory;
   location: {
     place: string;
